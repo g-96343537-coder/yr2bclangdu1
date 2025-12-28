@@ -5,76 +5,101 @@
   <meta name="viewport" content="width=device-width,initial-scale=1" />
   <title>上学了 - 在线朗读作业</title>
   <script src="https://accounts.google.com/gsi/client" async defer></script>
+  
   <style>
-    :root{ --bg:#fff8ff; --card:#fff; --accent:#ff9fc4; --accent-hover:#ff7eb0; --accent2:#ffd6a5; --text:#333; --muted:#7a6b7a; --shadow: 0 8px 24px rgba(122,107,122,0.12); }
-    html,body{height:100%;margin:0;font-family:"PingFang SC","Microsoft YaHei",sans-serif;background:url('https://wallpaperaccess.com/full/1164977.jpg') center/cover no-repeat fixed;color:var(--text)}
-    .wrap{min-height:100%;display:flex;align-items:center;justify-content:center;padding:20px;box-sizing: border-box;}
-    .card{width:800px; max-width:100%; background:var(--card); border-radius:24px; padding:40px; box-shadow:var(--shadow); display:flex; flex-direction: column; align-items:center; transition: all 0.3s ease;}
-    .header-area{text-align:center; margin-bottom: 20px;}
-    .avatar{width:80px;height:80px;border-radius:20px;background:linear-gradient(135deg,var(--accent),var(--accent2));display:inline-flex;align-items:center;justify-content:center;font-weight:700;color:#fff;font-size:36px;box-shadow:0 6px 18px rgba(255,159,196,0.3);margin-bottom: 15px;}
-    h1{margin:0;font-size:24px;color:#4a3b4a;}
-    p.subtitle{margin:8px 0 0;color:var(--muted);font-size:14px;}
-    .view-section { display: none; width: 100%; animation: fadeIn 0.5s ease; }
-    .view-section.active { display: block; }
-    @keyframes fadeIn { from { opacity:0; transform: translateY(10px); } to { opacity:1; transform: translateY(0); } }
-    
-    .form-group { margin-bottom: 20px; text-align: left; width: 100%; max-width: 320px; margin: 0 auto 20px auto; }
-    label { display: block; margin-bottom: 8px; font-weight: bold; color: var(--muted); }
-    select { width: 100%; padding: 12px; border: 2px solid #ffe4ed; border-radius: 12px; font-size: 16px; outline: none; }
-    
-    /* Google 按钮容器 */
-    .google-btn-wrapper { width: 100%; display: flex; justify-content: center; margin: 20px 0; min-height: 50px;}
-
-    .user-card {
-      display: none; background: #f0fff4; border: 1px solid #c6f6d5; 
-      padding: 10px 20px; border-radius: 50px; align-items: center; gap: 10px; margin-bottom: 20px;
+    :root{
+      --bg:#fff8ff;
+      --card:#fff;
+      --accent:#ff9fc4;
+      --accent2:#ffd6a5;
+      --text:#333;
+      --muted:#7a6b7a;
+      --shadow: 0 8px 24px rgba(122,107,122,0.12);
     }
-    .user-card img { width: 30px; height: 30px; border-radius: 50%; }
-    .user-card span { font-weight: bold; color: #276749; font-size: 14px; }
+    html,body{height:100%;margin:0;font-family:"PingFang SC","Microsoft YaHei","Noto Sans CJK SC",sans-serif;background:url('https://wallpaperaccess.com/full/1164977.jpg') center/cover no-repeat fixed;color:var(--text)}
+    .wrap{min-height:100%;display:flex;align-items:center;justify-content:center;padding:20px;}
+    /* 核心卡片样式：默认横向排列 */
+    .card{width:900px;max-width:95%;background:var(--card);border-radius:24px;padding:36px;box-shadow:var(--shadow);display:flex;gap:30px;align-items:flex-start; transition: all 0.3s ease;}
+    
+    /* 登录和成功页面的特殊样式：强制纵向居中 */
+    .card.center-layout { flex-direction: column; align-items: center; text-align: center; max-width: 600px;}
 
-    .btn-large {
-      background: linear-gradient(90deg,var(--accent),#ffd6a5); color: #7a2e4a; border: none; padding: 14px 40px;
-      font-size: 18px; font-weight: bold; border-radius: 50px; cursor: pointer; box-shadow: 0 6px 16px rgba(255,159,196,0.4);
-      transition: transform 0.2s; margin-top: 10px; width: 100%; max-width: 320px;
-    }
-    .btn-large:disabled { opacity: 0.5; cursor: not-allowed; background: #eee; box-shadow:none; color:#aaa; }
+    .left{flex:1; width: 100%;}
+    .cute-head{display:flex;align-items:center;gap:18px; margin-bottom: 20px;}
+    /* 居中模式下的头部调整 */
+    .center-layout .cute-head { flex-direction: column; gap: 10px; text-align: center;}
 
-    /* 朗读页样式 - 已调整字体大小以适应长句 */
-    .sentence-box{background:linear-gradient(180deg,#ffffff,#fffaf6);border-radius:16px; padding:30px 20px;display:flex; align-items:center; justify-content:center;min-height:220px; width: 100%; margin: 20px 0;border: 1px solid #fff0f5;}
-    /* ⚠️ 修改：字体调整为 26px 以容纳更长的课文 */
-    .sentence{font-size:26px;line-height:1.8;text-align:justify; letter-spacing:1px; color: #444; padding: 0 10px;}
-    .controls{display:flex;gap:12px;align-items:center;justify-content:center;margin-top:10px; flex-wrap: wrap;}
-    .ctrl-btn{padding:10px 20px; border-radius:12px; border:none; cursor:pointer; font-weight:700; font-size: 15px;box-shadow:0 4px 12px rgba(0,0,0,0.05); transition: background 0.2s;}
-    .btn-primary{background:var(--accent);color:#fff;}
-    .btn-ghost{background:#fff; border:2px solid #ffe4ed; color:var(--accent);}
+    .avatar{width:78px;height:78px;border-radius:18px;background:linear-gradient(135deg,var(--accent),var(--accent2));display:flex;align-items:center;justify-content:center;font-weight:700;color:#fff;font-size:34px;box-shadow:0 6px 18px rgba(255,159,196,0.25); flex-shrink: 0;}
+    h1{margin:0;font-size:24px; color: #4a3b4a;}
+    p.subtitle{margin:6px 0 0;color:var(--muted); font-size: 15px;}
+
+    .sentence-box{background:linear-gradient(180deg,#ffffff,#fffaf6);border-radius:20px;padding:30px 20px;display:flex;align-items:center;justify-content:center;min-height:200px; border: 2px solid #fff0f5;}
+    /* ✅ 字体设置为 40px */
+    .sentence{font-size:40px;line-height:1.5;text-align:center;letter-spacing:2px; color: #444; font-weight: bold;}
     .sentence .ch{transition: color 150ms ease, transform 150ms ease; display: inline-block;}
     
-    @media (max-width:600px){ 
-        .card{padding:24px;} 
-        /* 移动端字体相应缩小 */
-        .sentence{font-size:20px; text-align: left;} 
+    .controls{display:flex;gap:15px;align-items:center;justify-content:center;margin-top:24px; flex-wrap: wrap;}
+    button{padding:12px 24px;border-radius:50px;border:none;cursor:pointer;font-weight:700;box-shadow:0 6px 18px rgba(0,0,0,0.06); font-size: 16px; transition: transform 0.2s;}
+    button:active { transform: scale(0.98); }
+    .btn-primary{background:linear-gradient(90deg,var(--accent),#ffd6a5);color:#7a2e4a;}
+    .btn-ghost{background:transparent;border:2px solid #ffd6a5;color:var(--accent);}
+    .btn-small-ghost{ padding: 8px 16px; font-size: 13px; background: #fff; border: 1px solid #eee; color: var(--muted);}
+
+    .side{width:260px; flex-shrink: 0;}
+    .meta{background:#fff9fc;border-radius:16px;padding:20px;box-shadow:0 4px 12px rgba(122,107,122,0.05); border: 1px solid #ffe4ed;}
+    .meta-item { margin-bottom: 12px; }
+    .meta-label { display: block; font-size: 12px; color: var(--accent); font-weight: bold; margin-bottom: 4px;}
+    .meta-value { font-size: 16px; color: var(--text); font-weight: bold;}
+
+    .footer{margin-top:20px;color:var(--muted);font-size:13px;text-align:center;}
+
+    /* 视图切换动画 */
+    .view-section { display: none; animation: fadeIn 0.4s ease; }
+    .view-section.active { display: flex; }
+    @keyframes fadeIn { from { opacity:0; transform: translateY(15px); } to { opacity:1; transform: translateY(0); } }
+
+    /* 表单元素 */
+    .form-group { margin-bottom: 20px; text-align: left; width: 100%; max-width: 320px; }
+    select { width: 100%; padding: 12px; border: 2px solid #ffe4ed; border-radius: 12px; font-size: 16px; outline: none; background: #fff;}
+    .google-btn-wrapper { width: 100%; display: flex; justify-content: center; margin: 20px 0; min-height: 50px;}
+    .user-card { display: none; background: #f0fff4; border: 1px solid #c6f6d5; padding: 8px 16px; border-radius: 50px; align-items: center; gap: 10px; margin-bottom: 20px; }
+    .user-card img { width: 28px; height: 28px; border-radius: 50%; }
+    .user-card span { font-weight: bold; color: #276749; font-size: 14px; }
+    .btn-large { width: 100%; max-width: 320px; font-size: 18px; padding: 14px;}
+    .btn-large:disabled { opacity: 0.5; cursor: not-allowed; background: #eee; box-shadow:none; color:#aaa; }
+
+    @media (max-width:768px){
+      .card{flex-direction:column;padding:24px; align-items: center;}
+      .side{width:100%; order: 2;} /* 手机上信息栏在下方 */
+      .left { order: 1; }
+      /* 手机端字体稍微缩小一点，防止溢出，依然很大 */
+      .sentence{font-size:32px;} 
+      .cute-head { justify-content: center; }
     }
   </style>
 </head>
 <body>
   <div class="wrap">
     
-    <div id="loginView" class="card view-section active">
-      <div class="header-area">
+    <div id="loginView" class="card center-layout view-section active">
+      <div class="cute-head">
         <div class="avatar">📖</div>
-        <h1>上学了 - 课文朗读</h1>
-        <p class="subtitle">请选择班级并登录 Google 账号</p>
+        <div>
+            <h1>上学了 - 课文朗读</h1>
+            <p class="subtitle">请选择班级并登录 Google 账号</p>
+        </div>
       </div>
 
-      <div class="form-group">
-        <label>选择班级 (Class)</label>
+      <div class="form-group" style="margin-top: 20px;">
+        <label style="font-weight:bold;color:var(--muted);display:block;margin-bottom:8px;">选择班级 (Class)</label>
         <select id="classSelect">
           <option value="" disabled selected>请点击选择...</option>
-          <option value="1M">1M</option>
-          <option value="1K">1K</option>
-          <option value="1B">1B</option>
-          <option value="1H">1H</option>
-          <option value="1J">1J</option>
+          <option value="2M">2M</option>
+          <option value="2K">2K</option>
+          <option value="2B">2B</option>
+          <option value="2H">2H</option>
+          <option value="2J">2J</option>
+          <option value="2U">2U</option>
         </select>
       </div>
 
@@ -92,53 +117,85 @@
         <div class="g_id_signin" data-type="standard" data-size="large" data-theme="outline" data-text="sign_in_with" data-shape="rectangular" data-logo_alignment="left"></div>
       </div>
 
-      <button id="startAppBtn" class="btn-large" disabled>请先登录</button>
+      <button id="startAppBtn" class="btn-primary btn-large" disabled>请先登录</button>
       
-      <p style="font-size:12px; color:#aaa; margin-top:30px;">© 华文课室</p>
+      <div class="footer">© 华文课室</div>
     </div>
 
     <div id="readingView" class="card view-section">
-      <div style="display:flex;gap:15px;align-items:center;width:100%;margin-bottom:10px;">
-        <div class="avatar" style="width:60px;height:60px;font-size:28px;margin:0;">读</div>
-        <div style="text-align:left;">
-          <h1 style="font-size:20px;">正在朗读</h1>
-          <p class="subtitle" id="studentInfoDisplay">...</p>
+      <div class="left">
+          <div class="cute-head">
+            <div class="avatar" style="font-size:30px;">🔊</div>
+            <div>
+                <h1>正在朗读</h1>
+                <p class="subtitle">跟着声音大声读出来哦！</p>
+            </div>
+          </div>
+
+          <div class="sentence-box">
+              <div class="sentence" id="sentenceText">加载中...</div>
+          </div>
+          
+          <div class="controls">
+            <button id="prevBtn" class="btn-ghost">⬅ 上一句</button>
+            <button id="playBtn" class="btn-primary" style="padding: 12px 30px; font-size: 18px;">播放 ▶</button>
+            <button id="nextBtn" class="btn-ghost">下一句 ➡</button>
+          </div>
+          <div class="controls" style="margin-top: 10px;">
+             <button id="autoBtn" class="btn-small-ghost">自动播放：关</button>
+          </div>
+      </div>
+      
+      <div class="side">
+          <div class="meta">
+              <div class="meta-item">
+                  <span class="meta-label">班级 Class</span>
+                  <span class="meta-value" id="metaClass">-</span>
+              </div>
+              <div class="meta-item">
+                  <span class="meta-label">姓名 Name</span>
+                  <span class="meta-value" id="metaName" style="font-size: 14px;">请先登录</span>
+              </div>
+              <div class="meta-item" style="margin-top: 20px;">
+                  <span class="meta-label">当前进度 Progress</span>
+                  <span class="meta-value" style="color:var(--accent); font-size: 20px;" id="footerInfo">0 / 8</span>
+              </div>
+          </div>
+      </div>
+    </div>
+
+    <div id="successView" class="card center-layout view-section">
+      <div style="font-size:70px;margin-bottom:10px">🎉</div>
+      <div class="cute-head">
+        <div>
+            <h1>恭喜你！</h1>
+            <p class="subtitle">你已经完成了今天的朗读功课。</p>
         </div>
       </div>
-
-      <div class="sentence-box"><div class="sentence" id="sentenceText">加载中...</div></div>
-      <div class="controls">
-        <button id="prevBtn" class="ctrl-btn btn-ghost">⬅ 上一句</button>
-        <button id="playBtn" class="ctrl-btn btn-primary">🔊 朗读</button>
-        <button id="nextBtn" class="ctrl-btn btn-ghost">下一句 ➡</button>
+      
+      <div style="background:#f0fff4;color:#2e7d32;padding:15px;border-radius:12px;margin:20px auto;font-size:14px; display:inline-block; border: 1px solid #c6f6d5;">
+        ✅ 账号与成绩已提交到后台
       </div>
-      <div class="controls" style="margin-top:15px;">
-         <button id="autoBtn" class="ctrl-btn btn-ghost" style="font-size:13px;">自动播放：关</button>
-      </div>
-      <div style="margin-top:15px;font-size:13px;color:var(--muted)" id="footerInfo">进度 1 / 4</div>
+      <br>
+      <button onclick="location.reload()" class="btn-primary btn-large">再读一次</button>
     </div>
 
-    <div id="successView" class="card view-section" style="text-align:center;">
-      <div style="font-size:60px;margin-bottom:20px">🎉</div>
-      <h1 style="margin-bottom:10px">恭喜你！</h1>
-      <p style="color:var(--muted);margin-bottom:30px">你已经完成了今天的朗读功课。</p>
-      <div style="background:#f0fff4;color:#2e7d32;padding:15px;border-radius:12px;margin-bottom:20px;font-size:14px;">
-        ✅ 账号与成绩已提交
-      </div>
-      <button onclick="location.reload()" class="btn-large">再读一次</button>
-    </div>
   </div>
 
   <script>
     // ⚠️ 替换这里为你新发布的 Web App URL
     const GAS_URL = "https://script.google.com/macros/s/AKfycbyjtTnNU6SJjp98UE93BmJfLFmNu7Z6yCDvqTA3-mWdiUyZqBx1wVzsZaM2tpxZJeV83A/exec";
     
-    // ✅ 已更新为长篇课文
+    // ✅ 已将课文拆分为 8 个短句
     const sentences = [
-      "阳光悄悄来到校园，万紫千红的花儿，在阳光下一同开放。",
-      "阳光悄悄来到教室，朗朗的读书声中，我们一同搭上学习的列车。",
-      "我们一同歌唱，唱出世界的美丽，我们一同前进，感受发现的快乐，一同慢慢认识这世界，一同写下我们的故事。",
-      "白云在天上，说着风的故事，我们在校园，写着我们的故事，故事里有笑声也有泪水，还有我们一同成长的点滴。"
+      "阳光悄悄来到校园，",
+      "万紫千红的花儿，",
+      "在阳光下一同开放。",
+      "阳光悄悄来到教室，",
+      "朗朗的读书声中，",
+      "我们一同搭上学习的列车。",
+      "我们一同歌唱，",
+      "唱出世界的美丽。"
     ];
     
     let currentClass = "";
@@ -160,7 +217,7 @@
 
       document.getElementById('googleBtnContainer').style.display = 'none';
       const userCard = document.getElementById('userInfo');
-      userCard.style.display = 'flex';
+      userCard.style.display = 'inline-flex';
       document.getElementById('userImg').src = googleUser.picture;
       document.getElementById('userNameDisplay').textContent = googleUser.name;
 
@@ -192,12 +249,13 @@
 
     document.getElementById('startAppBtn').addEventListener('click', () => {
       document.getElementById('loginView').classList.remove('active');
-      document.getElementById('loginView').style.display = 'none';
       const rv = document.getElementById('readingView');
-      rv.style.display = 'flex'; rv.classList.add('active');
+      rv.classList.add('active');
       
-      document.getElementById('studentInfoDisplay').textContent = 
-        `班级: ${currentClass} · ${googleUser.name}`;
+      // 更新侧边栏信息
+      document.getElementById('metaClass').textContent = currentClass;
+      document.getElementById('metaName').textContent = googleUser.name;
+
       loadSentence(0);
     });
 
@@ -209,7 +267,7 @@
       index = i;
       // 将句子拆分为字符并包裹 span，方便逐字高亮
       sentenceText.innerHTML = sentences[index].split('').map((ch,idx)=>`<span class="ch" data-i="${idx}">${ch}</span>`).join('');
-      document.getElementById('footerInfo').textContent = `进度 ${index+1} / ${sentences.length}`;
+      document.getElementById('footerInfo').textContent = `${index+1} / ${sentences.length}`;
     }
 
     function playCurrent() {
@@ -218,7 +276,7 @@
       
       const msg = new SpeechSynthesisUtterance(sentences[index]);
       msg.lang = 'zh-CN'; 
-      msg.rate = 0.9; // 语速
+      msg.rate = 0.85; // 语速稍微调慢一点点适应大字体
       
       // 逐字高亮逻辑
       msg.onboundary = (e) => { 
@@ -227,7 +285,8 @@
       
       // 朗读结束后的逻辑
       msg.onend = () => { 
-        if(auto) autoTimer = setTimeout(()=>loadSentence(index+1)||playCurrent(), 2000); // 长句子读完多停顿一下(2秒)
+        // 短句子读完停顿 1.5 秒
+        if(auto) autoTimer = setTimeout(()=>loadSentence(index+1)||playCurrent(), 1500); 
       };
       
       window.speechSynthesis.speak(msg);
@@ -235,7 +294,7 @@
     
     function highlight(i) {
       document.querySelectorAll('.ch').forEach(el=>el.style.color='');
-      // 高亮逻辑需要稍微模糊匹配，因为长句可能会有标点偏移
+      // 高亮颜色使用可爱的粉色
       const span = document.querySelector(`.ch[data-i="${i}"]`);
       if(span) span.style.color='#ff4fa3';
     }
@@ -258,9 +317,9 @@
         body: formData
       });
 
-      document.getElementById('readingView').style.display='none';
+      document.getElementById('readingView').classList.remove('active');
       const sv = document.getElementById('successView');
-      sv.style.display='block'; sv.classList.add('active');
+      sv.classList.add('active');
     }
 
     document.getElementById('playBtn').onclick = playCurrent;
@@ -270,9 +329,6 @@
       auto = !auto; this.textContent = auto?"自动播放：开":"自动播放：关";
       if(auto) playCurrent(); else window.speechSynthesis.cancel();
     };
-    
-    // 初始化不自动加载，等待点击开始
   </script>
 </body>
-
 </html>
