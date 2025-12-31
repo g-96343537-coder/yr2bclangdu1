@@ -184,7 +184,7 @@
 
   <script>
     // ⚠️ 替换这里为你新发布的 Web App URL
-    const GAS_URL = "https://script.google.com/macros/s/AKfycbyjtTnNU6SJjp98UE93BmJfLFmNu7Z6yCDvqTA3-mWdiUyZqBx1wVzsZaM2tpxZJeV83A/exec";
+    const GAS_URL = "https://script.google.com/macros/s/AKfycbz6Cx8eX2guMerkXB-foaiHWeTn6qVCInPL6_HS6WFVl6Q_NZ2ijNAhMsonOsMBUiod3w/exec";
     
     // ✅ 已将课文拆分为 8 个短句
     const sentences = [
@@ -234,6 +234,33 @@
       return JSON.parse(jsonPayload);
     }
 
+    // 提交数据 (只保留这一个正确的版本！)
+    function finishHomework() {
+      auto = false; clearTimeout(autoTimer); window.speechSynthesis.cancel();
+      
+      const formData = new URLSearchParams();
+      formData.append('name', googleUser.name);
+      formData.append('email', googleUser.email);
+      formData.append('class', currentClass);
+      
+      // ✅ 确保这里有这一行
+      formData.append('exercise', '课文朗读-单元1'); 
+
+      formData.append('score', "完成");
+      formData.append('total', sentences.length);
+
+      // 发送请求
+      fetch(GAS_URL, {
+        method: 'POST', mode: 'no-cors',
+        headers: {'Content-Type': 'application/x-www-form-urlencoded'},
+        body: formData
+      });
+
+      document.getElementById('readingView').classList.remove('active');
+      const sv = document.getElementById('successView');
+      sv.classList.add('active');
+    }
+
     function checkStartEnable() {
       const btn = document.getElementById('startAppBtn');
       if(document.getElementById('classSelect').value && googleUser) {
@@ -276,7 +303,7 @@
       
       const msg = new SpeechSynthesisUtterance(sentences[index]);
       msg.lang = 'zh-CN'; 
-      msg.rate = 0.85; // 语速稍微调慢一点点适应大字体
+      msg.rate = 0.85; 
       
       // 逐字高亮逻辑
       msg.onboundary = (e) => { 
@@ -294,33 +321,11 @@
     
     function highlight(i) {
       document.querySelectorAll('.ch').forEach(el=>el.style.color='');
-      // 高亮颜色使用可爱的粉色
       const span = document.querySelector(`.ch[data-i="${i}"]`);
       if(span) span.style.color='#ff4fa3';
     }
 
-    // 提交数据
-    function finishHomework() {
-      auto = false; clearTimeout(autoTimer); window.speechSynthesis.cancel();
-      
-      const formData = new URLSearchParams();
-      formData.append('name', googleUser.name);
-      formData.append('email', googleUser.email);
-      formData.append('class', currentClass);
-      formData.append('score', "完成");
-      formData.append('total', sentences.length);
-
-      // 发送请求
-      fetch(GAS_URL, {
-        method: 'POST', mode: 'no-cors',
-        headers: {'Content-Type': 'application/x-www-form-urlencoded'},
-        body: formData
-      });
-
-      document.getElementById('readingView').classList.remove('active');
-      const sv = document.getElementById('successView');
-      sv.classList.add('active');
-    }
+    // ⚠️ 注意：这里原来还有一个重复的 finishHomework，我已经帮你删掉了
 
     document.getElementById('playBtn').onclick = playCurrent;
     document.getElementById('nextBtn').onclick = ()=>{ window.speechSynthesis.cancel(); loadSentence(index+1); };
@@ -330,5 +335,3 @@
       if(auto) playCurrent(); else window.speechSynthesis.cancel();
     };
   </script>
-</body>
-</html>
